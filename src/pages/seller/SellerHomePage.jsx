@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.jsx';
 import { Button } from '@/components/ui/button.jsx';
 import { Progress } from '@/components/ui/progress.jsx';
@@ -13,14 +13,19 @@ import {
   ArrowUpRight,
   Calendar,
   Target,
-  Gift
+  Gift,
+  Edit3
 } from 'lucide-react';
 import { useUserType } from '../../contexts/UserTypeContext.jsx';
 import { useCurrency } from '../../contexts/CurrencyContext.jsx';
+import PersonalizedFeed from '../../components/PersonalizedFeed.jsx';
+import CreatePost from '../../components/CreatePost.jsx';
+import SuggestedUsers from '../../components/SuggestedUsers.jsx';
 
 const SellerHomePage = () => {
   const { currentProfile } = useUserType();
   const { formatAmount } = useCurrency();
+  const [showCreatePost, setShowCreatePost] = useState(false);
 
   const todayStats = {
     sales: 3,
@@ -264,11 +269,41 @@ const SellerHomePage = () => {
                   <Gift className="h-4 w-4 mr-2" />
                   Demander de l'aide
                 </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => setShowCreatePost(true)}
+                >
+                  <Edit3 className="h-4 w-4 mr-2" />
+                  Créer une publication
+                </Button>
               </div>
             </CardContent>
           </Card>
         </div>
+
+        {/* Utilisateurs suggérés */}
+        <div className="mt-8">
+          <SuggestedUsers maxUsers={5} />
+        </div>
+
+        {/* Fil d'actualité personnalisé */}
+        <div className="mt-8">
+          <PersonalizedFeed onCreatePost={() => setShowCreatePost(true)} />
+        </div>
       </div>
+
+      {/* Modal de création de post */}
+      {showCreatePost && (
+        <CreatePost 
+          onClose={() => setShowCreatePost(false)}
+          onPostCreated={(newPost) => {
+            setShowCreatePost(false);
+            // Ici on pourrait ajouter le nouveau post au fil d'actualité
+            console.log('Nouveau post créé:', newPost);
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -4,12 +4,17 @@ import { Input } from '@/components/ui/input.jsx';
 import { Label } from '@/components/ui/label.jsx';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.jsx';
 import { Badge } from '@/components/ui/badge.jsx';
-import { TrendingUp, DollarSign, Target, Calendar, Users, Star } from 'lucide-react';
+import { TrendingUp, DollarSign, Target, Calendar, Users, Star, Lock } from 'lucide-react';
+import { useSubscription } from '../hooks/useSubscription.jsx';
 
 const MicroInvestment = ({ onClose, onInvest }) => {
+  const { canAccess } = useSubscription();
   const [selectedProject, setSelectedProject] = useState('');
   const [investmentAmount, setInvestmentAmount] = useState('');
   const [selectedPackage, setSelectedPackage] = useState('');
+
+  // Vérifier l'accès aux fonctionnalités
+  const hasMicroInvestment = canAccess('micro-investissement');
 
   const investmentProjects = [
     {
@@ -75,6 +80,15 @@ const MicroInvestment = ({ onClose, onInvest }) => {
   const selectedPackageData = selectedProjectData?.packages.find(p => p.id === selectedPackage);
 
   const handleInvestment = () => {
+    if (!hasMicroInvestment) {
+      // Déclencher le modal d'upgrade
+      if (window.requestUpgrade) {
+        window.requestUpgrade('micro-investissement');
+      }
+      onClose();
+      return;
+    }
+
     if (selectedProject && investmentAmount && selectedPackage) {
       onInvest({
         projectId: selectedProject,
@@ -84,6 +98,13 @@ const MicroInvestment = ({ onClose, onInvest }) => {
       });
       onClose();
     }
+  };
+
+  const handleUpgradeClick = () => {
+    if (window.requestUpgrade) {
+      window.requestUpgrade('micro-investissement');
+    }
+    onClose();
   };
 
   const getRiskColor = (risk) => {

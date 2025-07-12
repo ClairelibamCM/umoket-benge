@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button.jsx';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.jsx';
 import { Heart, TrendingUp, Users, ShoppingBag } from 'lucide-react';
 import { useCurrency } from '../contexts/CurrencyContext.jsx';
+import SocialFeed from '../components/SocialFeed.jsx';
 import marketImage from '../assets/w6Oe7NA4CSnv.jpeg';
 
 const HomePage = () => {
@@ -114,6 +115,117 @@ const HomePage = () => {
           </Card>
         </div>
 
+        {/* Carrousel des Nouvelles et Actualités */}
+        <div className="mb-16">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Nouvelles & Actualités</h2>
+            <p className="text-gray-600">Restez informé des dernières nouvelles de la communauté UmoKet</p>
+          </div>
+
+          <div className="relative">
+            <div className="overflow-hidden rounded-lg">
+              <div className="flex transition-transform duration-500 ease-in-out">
+                {/* Article 1 */}
+                <div className="w-full flex-shrink-0">
+                  <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+                    <CardContent className="p-8">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <span className="inline-block bg-white bg-opacity-20 text-white px-3 py-1 rounded-full text-sm mb-4">
+                            Nouvelle Fonctionnalité
+                          </span>
+                          <h3 className="text-2xl font-bold mb-4">
+                            Lancement du système de parrainage UmoKet !
+                          </h3>
+                          <p className="text-purple-100 mb-6">
+                            Invitez vos amis et gagnez des crédits Ubuntu pour chaque nouveau membre qui rejoint la communauté. 
+                            Plus vous parrainez, plus vous contribuez à l'expansion de notre mission solidaire.
+                          </p>
+                          <Button className="bg-white text-purple-600 hover:bg-purple-50">
+                            Découvrir le parrainage
+                          </Button>
+                        </div>
+                        <div className="hidden md:block ml-8">
+                          <div className="w-32 h-32 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                            <Users className="h-16 w-16 text-white" />
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Article 2 */}
+                <div className="w-full flex-shrink-0">
+                  <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+                    <CardContent className="p-8">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <span className="inline-block bg-white bg-opacity-20 text-white px-3 py-1 rounded-full text-sm mb-4">
+                            Impact Communautaire
+                          </span>
+                          <h3 className="text-2xl font-bold mb-4">
+                            Plus de 2,4 millions FCFA redistribués !
+                          </h3>
+                          <p className="text-green-100 mb-6">
+                            Grâce à votre engagement, la Tirelire Ubuntu a permis d'aider 127 vendeurs en difficulté. 
+                            Chaque achat compte et contribue à bâtir une économie plus équitable.
+                          </p>
+                          <Button className="bg-white text-green-600 hover:bg-green-50">
+                            Voir mon impact
+                          </Button>
+                        </div>
+                        <div className="hidden md:block ml-8">
+                          <div className="w-32 h-32 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                            <Heart className="h-16 w-16 text-white" />
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Article 3 */}
+                <div className="w-full flex-shrink-0">
+                  <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+                    <CardContent className="p-8">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <span className="inline-block bg-white bg-opacity-20 text-white px-3 py-1 rounded-full text-sm mb-4">
+                            Nouveaux Vendeurs
+                          </span>
+                          <h3 className="text-2xl font-bold mb-4">
+                            Découvrez nos nouveaux artisans !
+                          </h3>
+                          <p className="text-orange-100 mb-6">
+                            Cette semaine, 15 nouveaux vendeurs ont rejoint UmoKet avec des produits authentiques 
+                            d'Afrique de l'Ouest. Explorez leurs créations uniques et soutenez leur entrepreneuriat.
+                          </p>
+                          <Button className="bg-white text-orange-600 hover:bg-orange-50">
+                            Découvrir les nouveautés
+                          </Button>
+                        </div>
+                        <div className="hidden md:block ml-8">
+                          <div className="w-32 h-32 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                            <ShoppingBag className="h-16 w-16 text-white" />
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+
+            {/* Indicateurs de navigation */}
+            <div className="flex justify-center mt-6 space-x-2">
+              <button className="w-3 h-3 rounded-full bg-purple-600"></button>
+              <button className="w-3 h-3 rounded-full bg-gray-300"></button>
+              <button className="w-3 h-3 rounded-full bg-gray-300"></button>
+            </div>
+          </div>
+        </div>
+
         {/* Produits en vedette */}
         <div className="mb-16">
           <div className="flex justify-between items-center mb-8">
@@ -150,6 +262,11 @@ const HomePage = () => {
               </Card>
             ))}
           </div>
+        </div>
+
+        {/* Fil d'actualité social */}
+        <div className="mb-12">
+          <SocialFeed feedType="public" />
         </div>
 
         {/* Section Ubuntu */}

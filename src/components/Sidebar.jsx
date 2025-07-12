@@ -17,12 +17,15 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
-  UserPlus
+  UserPlus,
+  CreditCard
 } from 'lucide-react';
 import { useUserType } from '../contexts/UserTypeContext.jsx';
+import { useAuth } from '../contexts/AuthContext.jsx';
 
 const Sidebar = ({ currentPage, setCurrentPage, isAuthenticated }) => {
   const { userType } = useUserType();
+  const { openSubscriptionModal } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -36,6 +39,7 @@ const Sidebar = ({ currentPage, setCurrentPage, isAuthenticated }) => {
     { id: 'messages', label: 'Messages', icon: MessageCircle },
     { id: 'heroes', label: 'Ubuntu Heroes', icon: Trophy },
     { id: 'referral', label: 'Parrainage', icon: UserPlus },
+    { id: 'plans', label: 'Plans', icon: CreditCard, action: 'openPlans' },
     { id: 'settings', label: 'Profil', icon: Settings }
   ];
 
@@ -48,6 +52,7 @@ const Sidebar = ({ currentPage, setCurrentPage, isAuthenticated }) => {
     { id: 'sales-analytics', label: 'Mes Ventes', icon: BarChart3 },
     { id: 'messages', label: 'Messages', icon: MessageCircle },
     { id: 'help-requests', label: 'Demandes d\'Aide', icon: HelpCircle },
+    { id: 'plans', label: 'Plans', icon: CreditCard, action: 'openPlans' },
     { id: 'referral', label: 'Parrainage', icon: UserPlus },
     { id: 'shop-settings', label: 'Ma Boutique', icon: Store }
   ];
@@ -106,21 +111,35 @@ const Sidebar = ({ currentPage, setCurrentPage, isAuthenticated }) => {
           const Icon = item.icon;
           const isActive = currentPage === item.id;
           
+          const handleClick = () => {
+            if (item.action === 'openPlans') {
+              openSubscriptionModal();
+            } else {
+              setCurrentPage(item.id);
+            }
+            setIsMobileOpen(false); // Fermer le menu mobile après sélection
+          };
+          
           return (
             <button
               key={item.id}
-              onClick={() => {
-                setCurrentPage(item.id);
-                setIsMobileOpen(false); // Fermer le menu mobile après sélection
-              }}
+              onClick={handleClick}
               className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
                 isActive
                   ? 'bg-orange-100 text-orange-700 border border-orange-200'
-                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  : item.action === 'openPlans'
+                    ? 'text-blue-600 hover:bg-blue-50 hover:text-blue-700 border border-blue-200'
+                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
               }`}
               title={isCollapsed ? item.label : ''}
             >
-              <Icon className={`h-5 w-5 ${isActive ? 'text-orange-600' : ''}`} />
+              <Icon className={`h-5 w-5 ${
+                isActive 
+                  ? 'text-orange-600' 
+                  : item.action === 'openPlans' 
+                    ? 'text-blue-600' 
+                    : ''
+              }`} />
               {!isCollapsed && (
                 <span className="font-medium text-sm">{item.label}</span>
               )}

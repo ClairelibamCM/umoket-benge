@@ -4,9 +4,10 @@ import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { Progress } from '../../components/ui/progress';
 import { InfoButton } from '../../components/Modal';
-import { Wallet, TrendingUp, Heart, Users, ArrowUpRight, ArrowDownRight, Gift, Shield, Coins, DollarSign } from 'lucide-react';
+import { Wallet, TrendingUp, Heart, Users, ArrowUpRight, ArrowDownRight, Gift, Shield, Coins, DollarSign, Plus } from 'lucide-react';
 import { useUserType } from '../../contexts/UserTypeContext.jsx';
 import { useCurrency } from '../../contexts/CurrencyContext.jsx';
+import { useAuth } from '../../contexts/AuthContext.jsx';
 
 // Import des composants de transaction
 import SolidaryTransfer from '../../components/SolidaryTransfer';
@@ -14,10 +15,17 @@ import SplitPaymentUbuntu from '../../components/SplitPaymentUbuntu';
 import MicroInvestment from '../../components/MicroInvestment';
 import CommunityInsurance from '../../components/CommunityInsurance';
 
+// Import des composants sociaux
+import SocialFeed from '../../components/SocialFeed';
+import CreatePost from '../../components/CreatePost';
+
 const WalletPage = () => {
   const { userType } = useUserType();
   const { formatAmount } = useCurrency();
+  const { user } = useAuth();
   const [activeModal, setActiveModal] = useState(null);
+  const [showCreatePost, setShowCreatePost] = useState(false);
+  const [activeTab, setActiveTab] = useState('wallet'); // 'wallet' ou 'social'
 
   // Données de démonstration pour le portefeuille
   const walletData = {

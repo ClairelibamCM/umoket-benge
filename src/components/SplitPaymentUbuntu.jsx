@@ -4,13 +4,18 @@ import { Input } from '@/components/ui/input.jsx';
 import { Label } from '@/components/ui/label.jsx';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.jsx';
 import { Switch } from '@/components/ui/switch.jsx';
-import { Heart, ShoppingCart, DollarSign, Plus, Minus } from 'lucide-react';
+import { Heart, ShoppingCart, DollarSign, Plus, Minus, Lock } from 'lucide-react';
+import { useSubscription } from '../hooks/useSubscription.jsx';
 
 const SplitPaymentUbuntu = ({ product, onClose, onPayment }) => {
+  const { canAccess } = useSubscription();
   const [quantity, setQuantity] = useState(1);
   const [enableUbuntuSplit, setEnableUbuntuSplit] = useState(true);
   const [ubuntuAmount, setUbuntuAmount] = useState(500);
   const [selectedUbuntuVendor, setSelectedUbuntuVendor] = useState('');
+
+  // Vérifier l'accès aux fonctionnalités
+  const hasSplitPayment = canAccess('split-payment');
 
   const productPrice = product?.price || 25000;
   const totalProductCost = productPrice * quantity;
@@ -30,6 +35,15 @@ const SplitPaymentUbuntu = ({ product, onClose, onPayment }) => {
   };
 
   const handlePayment = () => {
+    if (!hasSplitPayment) {
+      // Déclencher le modal d'upgrade
+      if (window.requestUpgrade) {
+        window.requestUpgrade('split-payment');
+      }
+      onClose();
+      return;
+    }
+
     const paymentData = {
       product: product,
       quantity: quantity,
@@ -43,6 +57,13 @@ const SplitPaymentUbuntu = ({ product, onClose, onPayment }) => {
     onClose();
   };
 
+  const handleUpgradeClick = () => {
+    if (window.requestUpgrade) {
+      window.requestUpgrade('split-payment');
+    }
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <Card className="w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
@@ -53,6 +74,40 @@ const SplitPaymentUbuntu = ({ product, onClose, onPayment }) => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
+          {!hasSplitPayment ? (
+            // Interface pour les utilisateurs sans accès
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto">
+                <Lock className="h-8 w-8 text-orange-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Fonctionnalité Premium
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  Le Split Payment Ubuntu est réservé aux membres Sociétaire Plus et plus.
+                  Partagez vos achats avec la communauté Ubuntu pour aider d'autres vendeurs.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Button 
+                  onClick={handleUpgradeClick}
+                  className="w-full bg-orange-600 hover:bg-orange-700"
+                >
+                  Voir les plans d'abonnement
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={onClose}
+                  className="w-full"
+                >
+                  Fermer
+                </Button>
+              </div>
+            </div>
+          ) : (
+            // Interface normale pour les utilisateurs avec accès
+            <div className="space-y-6">
           {/* Produit */}
           <div className="bg-gray-50 p-4 rounded-lg">
             <h3 className="font-medium mb-2">{product?.name || 'Panier en osier traditionnel'}</h3>
@@ -226,6 +281,8 @@ const SplitPaymentUbuntu = ({ product, onClose, onPayment }) => {
               Payer {grandTotal.toLocaleString()} FCFA
             </Button>
           </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

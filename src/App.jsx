@@ -4,6 +4,8 @@ import { UserTypeProvider, useUserType } from './contexts/UserTypeContext.jsx';
 import { CurrencyProvider } from './contexts/CurrencyContext.jsx';
 import Header from './components/Header.jsx';
 import Sidebar from './components/Sidebar.jsx';
+import SubscriptionModal from './components/SubscriptionModal.jsx';
+import UpgradeModal from './components/UpgradeModal.jsx';
 import HomePage from './pages/HomePage.jsx';
 import AuthPage from './pages/AuthPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
@@ -14,6 +16,7 @@ import AboutPage from './pages/AboutPage.jsx';
 import ReferralPage from './pages/ReferralPage.jsx';
 
 // Pages Acheteur
+import BuyerHomePage from './pages/buyer/BuyerHomePage.jsx';
 import WalletPage from './pages/buyer/WalletPage.jsx';
 import UbuntuHeroesPage from './pages/buyer/UbuntuHeroesPage.jsx';
 import MessagesPage from './pages/buyer/MessagesPage.jsx';
@@ -32,11 +35,21 @@ import './App.css';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('home');
-  const { isAuthenticated, user } = useAuth();
+  const { 
+    isAuthenticated, 
+    user, 
+    showSubscriptionModal, 
+    closeSubscriptionModal, 
+    updateSubscription 
+  } = useAuth();
   const { userType, setUserType } = useUserType();
 
   // Gestion de la sélection du type d'utilisateur après connexion
   const [showUserTypeSelection, setShowUserTypeSelection] = useState(false);
+  
+  // Gestion du modal d'upgrade pour les fonctionnalités payantes
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradeFeature, setUpgradeFeature] = useState(null);
 
   useEffect(() => {
     if (isAuthenticated && !userType) {
@@ -120,7 +133,7 @@ function AppContent() {
     if (!userType || userType === 'buyer') {
       switch (currentPage) {
         case 'home':
-          return <HomePage />;
+          return isAuthenticated ? <BuyerHomePage /> : <HomePage />;
         case 'catalog':
           return <CatalogPage />;
         case 'dashboard':
@@ -138,13 +151,14 @@ function AppContent() {
         case 'settings':
           return <SettingsPage />;
         default:
-          return <HomePage />;
+          return isAuthenticated ? <BuyerHomePage /> : <HomePage />;
       }
     }
 
     // Pages pour les vendeurs
     if (userType === 'seller') {
       switch (currentPage) {
+        case 'home':
         case 'seller-home':
           return <SellerHomePage />;
         case 'products':
@@ -166,8 +180,34 @@ function AppContent() {
       }
     }
 
-    return <HomePage />;
+    return isAuthenticated ? <BuyerHomePage /> : <HomePage />;
   };
+
+  const handleSubscription = (planId) => {
+    updateSubscription(planId);
+    // Simuler un message de succès
+    alert(`Souscription au plan ${planId} réussie !`);
+  };
+
+  // Handlers pour le modal d'upgrade
+  const handleUpgradeRequest = (featureName) => {
+    setUpgradeFeature(featureName);
+    setShowUpgradeModal(true);
+  };
+
+  const handleCloseUpgradeModal = () => {
+    setShowUpgradeModal(false);
+    setUpgradeFeature(null);
+  };
+
+  const handleViewPlansFromUpgrade = () => {
+    setShowUpgradeModal(false);
+    setUpgradeFeature(null);
+    openSubscriptionModal();
+  };
+
+  // Rendre la fonction handleUpgradeRequest disponible globalement
+  window.requestUpgrade = handleUpgradeRequest;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -184,6 +224,23 @@ function AppContent() {
           {renderPage()}
         </main>
       </div>
+
+      {/* Modal d'abonnement */}
+      <SubscriptionModal
+        isOpen={showSubscriptionModal}
+        onClose={closeSubscriptionModal}
+        userType={user?.userType || 'buyer'}
+        onSubscribe={handleSubscription}
+      />
+
+      {/* Modal d'upgrade pour fonctionnalités payantes */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={handleCloseUpgradeModal}
+        feature={upgradeFeature}
+        userType={user?.userType || 'buyer'}
+        onViewPlans={handleViewPlansFromUpgrade}
+      />
     </div>
   );
 }

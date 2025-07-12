@@ -4,13 +4,18 @@ import { Input } from '@/components/ui/input.jsx';
 import { Label } from '@/components/ui/label.jsx';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.jsx';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.jsx';
-import { Heart, Send, User, DollarSign } from 'lucide-react';
+import { Heart, Send, User, DollarSign, Lock } from 'lucide-react';
+import { useSubscription } from '../hooks/useSubscription.jsx';
 
 const SolidaryTransfer = ({ onClose, onTransfer }) => {
+  const { canAccess } = useSubscription();
   const [selectedVendor, setSelectedVendor] = useState('');
   const [amount, setAmount] = useState('');
   const [message, setMessage] = useState('');
   const [transferType, setTransferType] = useState('direct'); // 'direct' ou 'ubuntu'
+
+  // Vérifier l'accès aux fonctionnalités
+  const hasVirementSolidaire = canAccess('virement-solidaire');
 
   const favoriteVendors = [
     { id: 'aminata_diallo', name: 'Aminata Diallo', location: 'Dakar, Sénégal', needsHelp: true },
@@ -21,6 +26,16 @@ const SolidaryTransfer = ({ onClose, onTransfer }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    if (!hasVirementSolidaire) {
+      // Déclencher le modal d'upgrade
+      if (window.requestUpgrade) {
+        window.requestUpgrade('virement-solidaire');
+      }
+      onClose();
+      return;
+    }
+    
     if (selectedVendor && amount) {
       onTransfer({
         vendorId: selectedVendor,
@@ -33,6 +48,13 @@ const SolidaryTransfer = ({ onClose, onTransfer }) => {
     }
   };
 
+  const handleUpgradeClick = () => {
+    if (window.requestUpgrade) {
+      window.requestUpgrade('virement-solidaire');
+    }
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <Card className="w-full max-w-md mx-4">
@@ -43,7 +65,40 @@ const SolidaryTransfer = ({ onClose, onTransfer }) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {!hasVirementSolidaire ? (
+            // Interface pour les utilisateurs sans accès
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto">
+                <Lock className="h-8 w-8 text-orange-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Fonctionnalité Premium
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  Le Virement Solidaire est réservé aux membres Sociétaire et plus.
+                  Aidez directement les vendeurs en difficulté avec cette fonctionnalité.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Button 
+                  onClick={handleUpgradeClick}
+                  className="w-full bg-orange-600 hover:bg-orange-700"
+                >
+                  Voir les plans d'abonnement
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={onClose}
+                  className="w-full"
+                >
+                  Fermer
+                </Button>
+              </div>
+            </div>
+          ) : (
+            // Interface normale pour les utilisateurs avec accès
+            <form onSubmit={handleSubmit} className="space-y-4">
             {/* Type de virement */}
             <div>
               <Label>Type de virement</Label>
@@ -185,7 +240,8 @@ const SolidaryTransfer = ({ onClose, onTransfer }) => {
                 Envoyer
               </Button>
             </div>
-          </form>
+            </form>
+          )}
         </CardContent>
       </Card>
     </div>
